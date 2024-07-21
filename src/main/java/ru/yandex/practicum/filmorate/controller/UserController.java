@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.annotation.Marker;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -27,10 +28,14 @@ public class UserController {
     @PostMapping
     @Validated({Marker.OnCreate.class})
     public User createUser(@Valid @RequestBody User user) {
-        checkNameEmpty(user);
+        log.info("Request to create film: {}", user);
+        if (user == null) {
+            throw new ValidationException("User is null");
+        }
 
         log.debug("Creating User: {}", user);
         user.setId(generateNextId());
+        user.checkNameEmpty();
         users.put(user.getId(), user);
         log.debug("User created: {}", user);
         return user;
@@ -39,22 +44,21 @@ public class UserController {
     @PutMapping
     @Validated({Marker.OnUpdate.class})
     public User updateUser(@Valid @RequestBody User user) {
-        checkNameEmpty(user);
+        log.info("Request to update film: {}", user);
+        if (user == null) {
+            throw new ValidationException("User is null");
+        }
 
         User oldUser = users.get(user.getId());
+        if (oldUser == null) throw new ValidationException("User not found");
         log.debug("Updating User: {}", oldUser);
-        oldUser.setName(user.getName());
-        oldUser.setLogin(user.getLogin());
-        oldUser.setEmail(user.getEmail());
-        oldUser.setBirthday(user.getBirthday());
+        if (user.getName() != null) oldUser.setName(user.getName());
+        if (user.getLogin() != null) oldUser.setLogin(user.getLogin());
+        if (user.getEmail() != null) oldUser.setEmail(user.getEmail());
+        if (user.getBirthday() != null) oldUser.setBirthday(user.getBirthday());
+        user.checkNameEmpty();
         log.debug("User updated: {}", oldUser);
         return oldUser;
-    }
-
-    private void checkNameEmpty(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
     }
 
 

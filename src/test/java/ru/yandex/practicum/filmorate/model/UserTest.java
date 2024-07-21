@@ -80,4 +80,15 @@ class UserTest {
         assertEquals("birthday", violation.getPropertyPath().toString());
         assertEquals("Дата рождения не может быть в будущем", violation.getMessage());
     }
+
+    @Test
+    @DisplayName("Create user with null birthday")
+    public void shouldThrowExceptionUserWithNullBirthday() {
+        user.setBirthday(null);
+        violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+        ConstraintViolation<User> violation = violations.iterator().next();
+        assertEquals("birthday", violation.getPropertyPath().toString());
+        assertEquals("День рождения не может быть пустым полем", violation.getMessage());
+    }
 }

@@ -18,7 +18,7 @@ import java.util.Map;
 public class FilmController {
 
     private final Map<Long, Film> films = new HashMap<>();
-    private int seq = 0;
+    private long seq = 0;
 
     @GetMapping
     public Collection<Film> getAllFilms() {
@@ -30,6 +30,9 @@ public class FilmController {
     @Validated({Marker.OnCreate.class})
     public Film createFilm(@Valid @RequestBody Film film) {
         log.info("Request to create film: {}", film);
+        if (film == null) {
+            throw new ValidationException("Film is null");
+        }
 
         log.debug("Creating film: {}", film);
         film.setId(generateNextId());
@@ -46,17 +49,18 @@ public class FilmController {
             throw new ValidationException("Film is null");
         }
 
-        Film old = films.get(film.getId());
-        log.debug("Updating film: {}", old);
-        old.setName(film.getName());
-        old.setDescription(film.getDescription());
-        old.setReleaseDate(film.getReleaseDate());
-        old.setDuration(film.getDuration());
+        Film oldFilm = films.get(film.getId());
+        if (oldFilm == null) throw new ValidationException("Film not found");
+        log.debug("Updating film: {}", oldFilm);
+        if (film.getName() != null) oldFilm.setName(film.getName());
+        if (film.getDescription() != null) oldFilm.setDescription(film.getDescription());
+        if (film.getReleaseDate() != null) oldFilm.setReleaseDate(film.getReleaseDate());
+        if (oldFilm.getDuration() != null) oldFilm.setDuration(film.getDuration());
         log.debug("Film updated: {}", film);
-        return old;
+        return oldFilm;
     }
 
     private Long generateNextId() {
-        return (long) ++seq;
+        return ++seq;
     }
 }

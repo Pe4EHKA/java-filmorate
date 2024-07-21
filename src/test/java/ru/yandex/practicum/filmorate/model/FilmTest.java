@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -27,7 +26,7 @@ class FilmTest {
                 .name("Avengers")
                 .description("Hero movie")
                 .releaseDate(LocalDate.of(2012, 4, 11))
-                .duration(Duration.ofMinutes(137))
+                .duration(137)
                 .build();
     }
 
@@ -50,6 +49,17 @@ class FilmTest {
     }
 
     @Test
+    @DisplayName("Create film with blank name")
+    public void shouldThrowExceptionFilmWithBlankName() {
+        film.setName(" ".repeat(20));
+        violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
+        ConstraintViolation<Film> violation = violations.iterator().next();
+        assertEquals("name", violation.getPropertyPath().toString());
+        assertEquals("Название фильма не может быть пустым", violation.getMessage());
+    }
+
+    @Test
     @DisplayName("Create film with long description")
     public void shouldThrowExceptionFilmWithLongDescription() {
         film.setDescription("a".repeat(201));
@@ -58,6 +68,17 @@ class FilmTest {
         ConstraintViolation<Film> violation = violations.iterator().next();
         assertEquals("description", violation.getPropertyPath().toString());
         assertEquals("Максимальная длина описания — 200 символов", violation.getMessage());
+    }
+
+    @Test
+    @DisplayName("Create film with null description")
+    public void shouldThrowExceptionFilmWithNullDescription() {
+        film.setDescription(null);
+        violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
+        ConstraintViolation<Film> violation = violations.iterator().next();
+        assertEquals("description", violation.getPropertyPath().toString());
+        assertEquals("Описание не должно быть пустым", violation.getMessage());
     }
 
     @Test
@@ -74,7 +95,7 @@ class FilmTest {
     @Test
     @DisplayName("Create film with negative duration")
     public void shouldThrowExceptionFilmWithNegativeDuration() {
-        film.setDuration(Duration.ofMinutes(-1));
+        film.setDuration(-1);
         violations = validator.validate(film);
         assertFalse(violations.isEmpty());
         ConstraintViolation<Film> violation = violations.iterator().next();
