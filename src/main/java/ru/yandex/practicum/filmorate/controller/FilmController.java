@@ -70,7 +70,7 @@ public class FilmController {
     @PutMapping("/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public void addLike(@PathVariable(name = "id") long filmId,
-                            @PathVariable(name = "userId") long userId) {
+                        @PathVariable(name = "userId") long userId) {
         log.info("Request to add like to film with id {} from user {}", filmId, userId);
         filmService.addLike(filmId, userId);
     }
