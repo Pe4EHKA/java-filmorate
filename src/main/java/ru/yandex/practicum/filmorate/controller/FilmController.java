@@ -22,21 +22,18 @@ public class FilmController {
     private final FilmService filmService;
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public Collection<Film> getAllFilms() {
         log.info("Request for all films");
         return filmService.getAllFilms();
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public Film getFilmById(@PathVariable(name = "id") int filmId) {
         log.info("Request for a film with id {}", filmId);
         return filmService.getFilmById(filmId);
     }
 
     @GetMapping("/popular")
-    @ResponseStatus(HttpStatus.OK)
     public Collection<Film> getPopularFilms(@RequestParam(name = "count", defaultValue = "10") int count) {
         log.info("Request for popular films");
         if (count <= 0) {
@@ -57,7 +54,6 @@ public class FilmController {
     }
 
     @PutMapping
-    @ResponseStatus(HttpStatus.OK)
     @Validated({Marker.OnUpdate.class})
     public Film updateFilm(@Valid @RequestBody Film film) {
         log.info("Request to update film: {}", film);
@@ -68,7 +64,6 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.OK)
     public void addLike(@PathVariable(name = "id") long filmId,
                         @PathVariable(name = "userId") long userId) {
         log.info("Request to add like to film with id {} from user {}", filmId, userId);
@@ -76,7 +71,6 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.OK)
     public void removeLike(@PathVariable(name = "id") long filmId,
                            @PathVariable(name = "userId") long userId) {
         log.info("Request to remove like from film with id {} from user {}", filmId, userId);

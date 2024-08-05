@@ -24,14 +24,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilmById(long id) {
+    public Optional<Film> getFilmById(long id) {
         log.info("Get film by id: {}", id);
-        Film film = films.get(id);
-        if (film == null) {
-            throw new NotFoundException("Film with id: %s not found".formatted(id));
-        }
-        log.info("Film with id: {} found and returned", id);
-        return films.get(id);
+        return Optional.ofNullable(films.get(id));
     }
 
     @Override
@@ -45,8 +40,8 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        Film oldFilm = films.get(film.getId());
-        if (oldFilm == null) throw new NotFoundException("Film not found");
+        Film oldFilm = getFilmById(film.getId())
+                .orElseThrow(() -> new NotFoundException("Film with id " + film.getId() + " not found"));
         log.debug("Updating film: {}", oldFilm);
         if (film.getName() != null) oldFilm.setName(film.getName());
         if (film.getDescription() != null) oldFilm.setDescription(film.getDescription());
@@ -62,7 +57,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         Set<Long> likes = filmLikes.computeIfAbsent(film.getId(), k -> new HashSet<>());
         likes.add(user.getId());
         log.debug("Added like to film: {}", film);
-        films.get(film.getId());
     }
 
     @Override

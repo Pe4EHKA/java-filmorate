@@ -31,39 +31,31 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(long id) {
-        return userStorage.getUserById(id);
+        return userStorage.getUserById(id)
+                .orElseThrow(() -> new NotFoundException("User with id: %d not found".formatted(id)));
     }
 
     @Override
     public User addToFriends(long userId, long friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-        if (userStorage.getUserById(user.getId()) == null) {
-            throw new NotFoundException("User with id " + user.getId() + " not found");
-        }
-        if (userStorage.getUserById(friend.getId()) == null) {
-            throw new NotFoundException("Friend with id " + friend.getId() + " not found");
-        }
+        User user = userStorage.getUserById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id: %d not found".formatted(userId)));
+        User friend = userStorage.getUserById(friendId).orElseThrow(() -> new NotFoundException("Friend with id: %d not found".formatted(friendId)));
         log.debug("Adding user {} to friend {}", user, friend);
         userStorage.addToFriends(user, friend);
         log.debug("Added user {} to friend {}", user, friend);
-        return userStorage.getUserById(friend.getId());
+        return friend;
     }
 
     @Override
     public User removeFromFriends(long userId, long friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-        if (userStorage.getUserById(user.getId()) == null) {
-            throw new NotFoundException("User with id " + user.getId() + " not found");
-        }
-        if (userStorage.getUserById(friend.getId()) == null) {
-            throw new NotFoundException("Friend with id " + friend.getId() + " not found");
-        }
+        User user = userStorage.getUserById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id: %d not found".formatted(userId)));
+        User friend = userStorage.getUserById(friendId)
+                .orElseThrow(() -> new NotFoundException("Friend with id: %d not found".formatted(friendId)));
         log.debug("Removing user {} from friend {}", user, friend);
         userStorage.removeFromFriends(user, friend);
         log.debug("Removed user {} from friend {}", user, friend);
-        return userStorage.getUserById(friend.getId());
+        return friend;
     }
 
     @Override
@@ -73,24 +65,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Collection<User> getMutualFriends(long userId, long friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-        if (userStorage.getUserById(user.getId()) == null) {
-            throw new NotFoundException("User with id " + user.getId() + " not found");
-        }
-        if (userStorage.getUserById(friend.getId()) == null) {
-            throw new NotFoundException("Friend with id " + friend.getId() + " not found");
-        }
+        User user = userStorage.getUserById(userId).orElseThrow(() -> new NotFoundException("User with id: %d not found".formatted(userId)));
+        User friend = userStorage.getUserById(friendId).orElseThrow(() -> new NotFoundException("Friend with id: %d not found".formatted(friendId)));
         log.info("Getting mutual friends of user {} from friend {}", user, friend);
         return userStorage.getMutualFriends(user, friend);
     }
 
     @Override
     public Collection<User> getFriendsList(long userId) {
-        User user = userStorage.getUserById(userId);
-        if (userStorage.getUserById(user.getId()) == null) {
-            throw new NotFoundException("User with id " + user.getId() + " not found");
-        }
+        User user = userStorage.getUserById(userId).orElseThrow(() -> new NotFoundException("User with id: %d not found".formatted(userId)));
         return userStorage.getFriendsList(user);
     }
 }

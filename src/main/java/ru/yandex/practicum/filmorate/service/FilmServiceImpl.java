@@ -23,7 +23,8 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film getFilmById(long id) {
         log.debug("Get film by id: {}", id);
-        return filmStorage.getFilmById(id);
+        return filmStorage.getFilmById(id)
+                .orElseThrow(() -> new NotFoundException("Film with id: %s not found".formatted(id)));
     }
 
     @Override
@@ -40,28 +41,20 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public void addLike(long filmId, long userId) {
-        Film film = filmStorage.getFilmById(filmId);
-        if (film == null) {
-            throw new NotFoundException("Film with id " + filmId + " not found");
-        }
-        User user = userStorage.getUserById(userId);
-        if (user == null) {
-            throw new NotFoundException("User with id " + userId + " not found");
-        }
+        Film film = filmStorage.getFilmById(filmId)
+                .orElseThrow(() -> new NotFoundException("Film with id " + filmId + " not found"));
+        User user = userStorage.getUserById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
         log.debug("Adding like to film {}, from user {}", film, user);
         filmStorage.addLike(film, user);
     }
 
     @Override
     public void removeLike(long filmId, long userId) {
-        Film film = filmStorage.getFilmById(filmId);
-        if (film == null) {
-            throw new NotFoundException("Film with id " + filmId + " not found");
-        }
-        User user = userStorage.getUserById(userId);
-        if (user == null) {
-            throw new NotFoundException("User with id " + userId + " not found");
-        }
+        Film film = filmStorage.getFilmById(filmId)
+                .orElseThrow(() -> new NotFoundException("Film with id " + filmId + " not found"));
+        User user = userStorage.getUserById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
         log.debug("Removing like from film {}, from user {}", film, user);
         filmStorage.removeLike(film, user);
         log.debug("Removed like from film {}, from user {}", film, user);

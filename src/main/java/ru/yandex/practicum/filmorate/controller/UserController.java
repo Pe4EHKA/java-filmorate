@@ -22,28 +22,24 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public Collection<User> getAllUsers() {
         log.info("Request for all users");
         return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public User getUserById(@PathVariable(name = "id") long userId) {
         log.info("Request for user with id {}", userId);
         return userService.getUserById(userId);
     }
 
     @GetMapping("/{id}/friends")
-    @ResponseStatus(HttpStatus.OK)
     public Collection<User> getUserFriends(@PathVariable(name = "id") long userId) {
         log.info("Request for friends of user with id {}", userId);
         return userService.getFriendsList(userId);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    @ResponseStatus(HttpStatus.OK)
     public Collection<User> getUserFriendsCommon(@PathVariable(name = "id") long userId,
                                                  @PathVariable(name = "otherId") long otherId) {
         log.info("Request for common friends of user with id {} and other id {}", userId, otherId);
@@ -62,7 +58,6 @@ public class UserController {
     }
 
     @PutMapping
-    @ResponseStatus(HttpStatus.OK)
     @Validated({Marker.OnUpdate.class})
     public User updateUser(@Valid @RequestBody User user) {
         log.info("Request to update user: {}", user);
@@ -73,14 +68,12 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    @ResponseStatus(HttpStatus.OK)
     public User addToFriends(@PathVariable(name = "id") long userId,
                              @PathVariable(name = "friendId") long friendId) {
         return userService.addToFriends(userId, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    @ResponseStatus(HttpStatus.OK)
     public User removeFromFriends(@PathVariable(name = "id") long userId,
                                   @PathVariable(name = "friendId") long friendId) {
         return userService.removeFromFriends(userId, friendId);

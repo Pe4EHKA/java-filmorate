@@ -23,19 +23,9 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User saveUser(User user) {
-        return users.put(user.getId(), user);
-    }
-
-    @Override
-    public User getUserById(long id) {
+    public Optional<User> getUserById(long id) {
         log.info("Get user by id: {}", id);
-        User user = users.get(id);
-        if (user == null) {
-            throw new NotFoundException("User with id: %s not found".formatted(id));
-        }
-        log.info("User with id: {} found and returned", id);
-        return user;
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
@@ -52,8 +42,8 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        User oldUser = users.get(user.getId());
-        if (oldUser == null) throw new NotFoundException("User with id: %s not found".formatted(user.getId()));
+        User oldUser = getUserById(user.getId())
+                .orElseThrow(() -> new NotFoundException("User with id: %s not found".formatted(user.getId())));
         log.debug("Updating User: {}", oldUser);
         if (user.getName() != null) oldUser.setName(user.getName());
         if (user.getLogin() != null) oldUser.setLogin(user.getLogin());
