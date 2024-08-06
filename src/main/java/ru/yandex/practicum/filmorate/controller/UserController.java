@@ -1,68 +1,81 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.annotation.Marker;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 @Slf4j
 public class UserController {
 
-    private final Map<Long, User> users = new HashMap<>();
-    private int seq = 0;
+    private final UserService userService;
 
     @GetMapping
     public Collection<User> getAllUsers() {
-        return users.values();
+        log.info("Request for all users");
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable(name = "id") long userId) {
+        log.info("Request for user with id {}", userId);
+        return userService.getUserById(userId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public Collection<User> getUserFriends(@PathVariable(name = "id") long userId) {
+        log.info("Request for friends of user with id {}", userId);
+        return userService.getFriendsList(userId);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public Collection<User> getUserFriendsCommon(@PathVariable(name = "id") long userId,
+                                                 @PathVariable(name = "otherId") long otherId) {
+        log.info("Request for common friends of user with id {} and other id {}", userId, otherId);
+        return userService.getMutualFriends(userId, otherId);
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     @Validated({Marker.OnCreate.class})
     public User createUser(@Valid @RequestBody User user) {
         log.info("Request to create film: {}", user);
         if (user == null) {
             throw new ValidationException("User is null");
         }
-
-        log.debug("Creating User: {}", user);
-        user.setId(generateNextId());
-        user.checkNameEmpty();
-        users.put(user.getId(), user);
-        log.debug("User created: {}", user);
-        return user;
+        return userService.createUser(user);
     }
 
     @PutMapping
     @Validated({Marker.OnUpdate.class})
     public User updateUser(@Valid @RequestBody User user) {
-        log.info("Request to update film: {}", user);
+        log.info("Request to update user: {}", user);
         if (user == null) {
             throw new ValidationException("User is null");
         }
-
-        User oldUser = users.get(user.getId());
-        if (oldUser == null) throw new ValidationException("User not found");
-        log.debug("Updating User: {}", oldUser);
-        if (user.getName() != null) oldUser.setName(user.getName());
-        if (user.getLogin() != null) oldUser.setLogin(user.getLogin());
-        if (user.getEmail() != null) oldUser.setEmail(user.getEmail());
-        if (user.getBirthday() != null) oldUser.setBirthday(user.getBirthday());
-        user.checkNameEmpty();
-        log.debug("User updated: {}", oldUser);
-        return oldUser;
+        return userService.updateUser(user);
     }
 
+    @PutMapping("/{id}/friends/{friendId}")
+    public User addToFriends(@PathVariable(name = "id") long userId,
+                             @PathVariable(name = "friendId") long friendId) {
+        return userService.addToFriends(userId, friendId);
+    }
 
-    private Long generateNextId() {
-        return (long) ++seq;
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public User removeFromFriends(@PathVariable(name = "id") long userId,
+                                  @PathVariable(name = "friendId") long friendId) {
+        return userService.removeFromFriends(userId, friendId);
     }
 }

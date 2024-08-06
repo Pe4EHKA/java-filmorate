@@ -1,44 +1,56 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.annotation.Marker;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/films")
+@RequiredArgsConstructor
 @Slf4j
 public class FilmController {
 
-    private final Map<Long, Film> films = new HashMap<>();
-    private long seq = 0;
+    private final FilmService filmService;
 
     @GetMapping
     public Collection<Film> getAllFilms() {
         log.info("Request for all films");
-        return films.values();
+        return filmService.getAllFilms();
+    }
+
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable(name = "id") int filmId) {
+        log.info("Request for a film with id {}", filmId);
+        return filmService.getFilmById(filmId);
+    }
+
+    @GetMapping("/popular")
+    public Collection<Film> getPopularFilms(@RequestParam(name = "count", defaultValue = "10") int count) {
+        log.info("Request for popular films");
+        if (count <= 0) {
+            throw new ValidationException("count must be greater than 0");
+        }
+        return filmService.getPopularFilms(count);
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     @Validated({Marker.OnCreate.class})
     public Film createFilm(@Valid @RequestBody Film film) {
         log.info("Request to create film: {}", film);
         if (film == null) {
             throw new ValidationException("Film is null");
         }
-
-        log.debug("Creating film: {}", film);
-        film.setId(generateNextId());
-        films.put(film.getId(), film);
-        log.debug("Film created: {}", film);
-        return film;
+        return filmService.createFilm(film);
     }
 
     @PutMapping
@@ -48,19 +60,20 @@ public class FilmController {
         if (film == null) {
             throw new ValidationException("Film is null");
         }
-
-        Film oldFilm = films.get(film.getId());
-        if (oldFilm == null) throw new ValidationException("Film not found");
-        log.debug("Updating film: {}", oldFilm);
-        if (film.getName() != null) oldFilm.setName(film.getName());
-        if (film.getDescription() != null) oldFilm.setDescription(film.getDescription());
-        if (film.getReleaseDate() != null) oldFilm.setReleaseDate(film.getReleaseDate());
-        if (oldFilm.getDuration() != null) oldFilm.setDuration(film.getDuration());
-        log.debug("Film updated: {}", film);
-        return oldFilm;
+        return filmService.updateFilm(film);
     }
 
-    private Long generateNextId() {
-        return ++seq;
+    @PutMapping("/{id}/like/{userId}")
+    public void addLike(@PathVariable(name = "id") long filmId,
+                        @PathVariable(name = "userId") long userId) {
+        log.info("Request to add like to film with id {} from user {}", filmId, userId);
+        filmService.addLike(filmId, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public void removeLike(@PathVariable(name = "id") long filmId,
+                           @PathVariable(name = "userId") long userId) {
+        log.info("Request to remove like from film with id {} from user {}", filmId, userId);
+        filmService.removeLike(filmId, userId);
     }
 }
