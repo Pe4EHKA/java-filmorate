@@ -16,12 +16,16 @@ public class User {
     @Null(groups = Marker.OnCreate.class)
     @NotNull(groups = Marker.OnUpdate.class)
     private Long id;
+
     @NotBlank(message = "Электронная почта не может быть пустой")
     @Email(message = "Почта должна содержать символ @")
     private String email;
+
     @NotBlank(message = "Логин не может быть пустым и содержать пробелы")
     private String login;
+
     private String name;
+
     @Past(message = "Дата рождения не может быть в будущем")
     @NotNull(message = "День рождения не может быть пустым полем")
     private LocalDate birthday;
