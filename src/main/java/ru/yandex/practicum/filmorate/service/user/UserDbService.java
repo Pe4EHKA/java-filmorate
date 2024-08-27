@@ -146,8 +146,8 @@ public class UserDbService implements UserService {
         checkUsersExist(userId, friendId, warnMessage);
         if (userId == friendId) {
             log.warn(warnMessage);
-            throw new UserControllerException(String.format(UserControllerException.
-                    DELETE_YOURSELF_FROM_FRIENDS, userId));
+            throw new UserControllerException(String.format(UserControllerException
+                    .DELETE_YOURSELF_FROM_FRIENDS, userId));
         }
         if (!friendshipRepository.containsInvite(friendId, userId)) {
             log.warn(warnMessage);
