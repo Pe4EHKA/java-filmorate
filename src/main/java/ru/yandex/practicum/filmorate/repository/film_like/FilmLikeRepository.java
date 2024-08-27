@@ -1,11 +1,11 @@
 package ru.yandex.practicum.filmorate.repository.film_like;
 
 public interface FilmLikeRepository {
-    void addLikeFilm(long film_id, long user_id);
+    void addLikeFilm(long filmId, long userId);
 
-    void deleteLikeFilm(long film_id, long user_id);
+    void deleteLikeFilm(long filmId, long userId);
 
-    int countLikeFilm(long film_id);
+    int countLikeFilm(long filmId);
 
-    boolean isLikeFilm(long film_id, long user_id);
+    boolean isLikeFilm(long filmId, long userId);
 }

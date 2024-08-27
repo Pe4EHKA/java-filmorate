@@ -24,33 +24,33 @@ public class FilmLikeDbStorage extends BaseRepository<Like> implements FilmLikeR
     }
 
     @Override
-    public void addLikeFilm(long film_id, long user_id) {
-        log.debug("Adding like film: {} from user {}", film_id, user_id);
-        jdbcTemplate.update(INSERT_LIKE_QUERY, film_id, user_id);
-        log.trace("Added like film: {} from user {}", film_id, user_id);
+    public void addLikeFilm(long filmId, long userId) {
+        log.debug("Adding like film: {} from user {}", filmId, userId);
+        jdbcTemplate.update(INSERT_LIKE_QUERY, filmId, userId);
+        log.trace("Added like film: {} from user {}", filmId, userId);
     }
 
     @Override
-    public void deleteLikeFilm(long film_id, long user_id) {
-        log.debug("Deleting like film: {} from user {}", film_id, user_id);
-        delete(DELETE_LIKE_QUERY, film_id, user_id);
-        log.trace("Deleted like film: {} from user {}", film_id, user_id);
+    public void deleteLikeFilm(long filmId, long userId) {
+        log.debug("Deleting like film: {} from user {}", filmId, userId);
+        delete(DELETE_LIKE_QUERY, filmId, userId);
+        log.trace("Deleted like film: {} from user {}", filmId, userId);
     }
 
     @Override
-    public int countLikeFilm(long film_id) {
-        log.debug("Counting likes film: {}", film_id);
-        Integer count = jdbcTemplate.queryForObject(COUNT_LIKE_QUERY, Integer.class, film_id);
+    public int countLikeFilm(long filmId) {
+        log.debug("Counting likes film: {}", filmId);
+        Integer count = jdbcTemplate.queryForObject(COUNT_LIKE_QUERY, Integer.class, filmId);
         if (count == null) {
-            throw new InternalServerException("Не удалось посчитать кол-во лайков для фильма с ID: " + film_id);
+            throw new InternalServerException("Не удалось посчитать кол-во лайков для фильма с ID: " + filmId);
         }
         return count;
     }
 
     @Override
-    public boolean isLikeFilm(long film_id, long user_id) {
-        log.debug("Checking likes film: {} from user {}", film_id, user_id);
-        Optional<Like> like = findOne(CHECK_LIKE_QUERY, film_id, user_id);
+    public boolean isLikeFilm(long filmId, long userId) {
+        log.debug("Checking likes film: {} from user {}", filmId, userId);
+        Optional<Like> like = findOne(CHECK_LIKE_QUERY, filmId, userId);
         return like.isPresent();
     }
 }
