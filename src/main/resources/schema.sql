@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS film_likes
 
 CREATE TABLE IF NOT EXISTS friendships
 (
-    from_user_id LONG NOT NULL REFERENCES users (id),
-    to_user_id   LONG NOT NULL REFERENCES users (id),
+    user_id LONG NOT NULL REFERENCES users (id),
+    friend_id   LONG NOT NULL REFERENCES users (id),
     accepted     BOOLEAN NOT NULL,
-    CONSTRAINT pk_friendships PRIMARY KEY (from_user_id, to_user_id)
+    CONSTRAINT pk_friendships PRIMARY KEY (user_id, friend_id)
 );

@@ -60,16 +60,6 @@ public class InMemoryFilmRepository implements FilmRepository {
 
     }
 
-    @Override
-    public void removeFilmGenres(long filmId) {
-
-    }
-
-    @Override
-    public void updateFilmGenres(long filmId, Collection<Genre> genres) {
-
-    }
-
     private Long generateNextId() {
         return ++seq;
     }

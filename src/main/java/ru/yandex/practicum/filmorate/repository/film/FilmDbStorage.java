@@ -90,6 +90,9 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmRepositor
                 film.getMpa().getId(),
                 film.getId()
         );
+        if (film.getGenres() != null) {
+            updateFilmGenres(film.getId(), film.getGenres());
+        }
         Optional<Film> result = findOne(FIND_BY_ID_QUERY, film.getId());
         if (result.isPresent()) {
             log.trace("Film updated {}", film);
@@ -111,23 +114,17 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmRepositor
     public void addFilmGenres(long filmId, Collection<Genre> genres) {
         log.debug("addFilmGenres {}", filmId);
         if (genres != null && !genres.isEmpty()) {
+            List<Object[]> params = new ArrayList<>(genres.size());
             for (Genre genre : genres) {
-                jdbcTemplate.update(INSERT_FILM_GENRES_QUERY, filmId, genre.getId());
+                params.add(new Object[]{filmId, genre.getId()});
                 log.trace("Film Id {} added genre Id {}", filmId, genre.getId());
             }
+            jdbcTemplate.batchUpdate(INSERT_FILM_GENRES_QUERY, params);
             log.debug("Added {} genres to film {}", genres.size(), filmId);
         }
     }
 
-    @Override
-    public void removeFilmGenres(long filmId) {
-        log.debug("removeFilmGenres {}", filmId);
-        delete(DELETE_FILM_GENRES_QUERY, filmId);
-        log.debug("removedFilmGenres {}", filmId);
-    }
-
-    @Override
-    public void updateFilmGenres(long filmId, Collection<Genre> genres) {
+    private void updateFilmGenres(long filmId, Collection<Genre> genres) {
         log.debug("updateFilmGenres {}", filmId);
         delete(DELETE_FILM_GENRES_QUERY, filmId);
         addFilmGenres(filmId, genres);

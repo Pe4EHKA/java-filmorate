@@ -25,8 +25,8 @@ class FriendshipDbStorageTest {
 
     static Friendship getTestFriendship() {
         return Friendship.builder()
-                .fromUserId(3L)
-                .toUserId(2L)
+                .userId(3L)
+                .friendId(2L)
                 .accepted(true)
                 .build();
     }
@@ -43,9 +43,9 @@ class FriendshipDbStorageTest {
     void addToFriends() {
         Friendship friendship = getTestFriendship();
         friendshipDbStorage
-                .addToFriends(friendship.getFromUserId(), friendship.getToUserId(), friendship.getAccepted());
+                .addToFriends(friendship.getUserId(), friendship.getFriendId(), friendship.getAccepted());
 
-        assertTrue(friendshipDbStorage.containsInvite(friendship.getFromUserId(), friendship.getToUserId()));
+        assertTrue(friendshipDbStorage.containsInvite(friendship.getUserId(), friendship.getFriendId()));
     }
 
     @Test

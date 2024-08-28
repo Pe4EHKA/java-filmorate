@@ -20,72 +20,42 @@ import ru.yandex.practicum.filmorate.model.ErrorResponse;
 @Slf4j
 public class ErrorHandler {
 
-    @ExceptionHandler
+    @ExceptionHandler({
+            NotFoundException.class,
+            GenreNotFoundException.class,
+            UserNotFoundException.class,
+            MpaNotFoundException.class
+    })
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleException(final NotFoundException e) {
+    public ErrorResponse handleNotFoundExceptions(final RuntimeException e) {
         log.error(e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({
+            ValidationException.class,
+            MpaWrongNumberException.class,
+            DataIntegrityViolationException.class
+    })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(final ValidationException e) {
+    public ErrorResponse handleBadRequestExceptions(final RuntimeException e) {
         log.error(e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({
+            InternalServerException.class,
+            RuntimeException.class
+    })
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleInternalServerException(final InternalServerException e) {
+    public ErrorResponse handleInternalServerExceptions(final InternalServerException e) {
         log.error(e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleUserNotFoundException(final UserNotFoundException e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.OK)  // Без этого Handler'а не проходит один тест, решил оставить
     public ErrorResponse handleFriendshipNotFoundException(final FriendshipNotFoundException e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleMpaNotFoundException(final MpaNotFoundException e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleMpaWrongNumberException(final MpaWrongNumberException e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleDataIntegrityViolationException(final DataIntegrityViolationException e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleGenreNotFoundException(final GenreNotFoundException e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleException(final RuntimeException e) {
         log.error(e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }

@@ -5,9 +5,11 @@ import java.util.Collection;
 public interface FriendshipRepository {
     Collection<Long> getFriendInvitesToUser(long toUserId);
 
-    void addToFriends(long fromUserId, long toUserId, boolean accepted);
+    Collection<Long> getMutualFriends(long userId, long friendId);
 
-    void removeFromFriends(long fromUserId, long toUserId);
+    void addToFriends(long userId, long toUserId, boolean accepted);
 
-    boolean containsInvite(long fromUserId, long toUserId);
+    void removeFromFriends(long userId, long toUserId);
+
+    boolean containsInvite(long userId, long toUserId);
 }

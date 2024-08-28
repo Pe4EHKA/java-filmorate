@@ -19,8 +19,4 @@ public interface FilmRepository {
     LinkedHashSet<Genre> getFilmGenres(long filmId);
 
     void addFilmGenres(long filmId, Collection<Genre> genres);
-
-    void removeFilmGenres(long filmId);
-
-    void updateFilmGenres(long filmId, Collection<Genre> genres);
 }

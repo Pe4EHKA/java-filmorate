@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -11,16 +11,17 @@ import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 public abstract class BaseRepository<T> {
     protected final JdbcTemplate jdbcTemplate;
     protected final RowMapper<T> mapper;
 
     protected Optional<T> findOne(String query, Object... params) {
-        try {
-            T result = jdbcTemplate.queryForObject(query, mapper, params);
-            return Optional.ofNullable(result);
-        } catch (EmptyResultDataAccessException e) {
+        List<T> result = jdbcTemplate.query(query, mapper, params);
+        if (!result.isEmpty()) {
+            return Optional.ofNullable(result.getFirst());
+        } else {
             return Optional.empty();
         }
     }
@@ -37,7 +38,7 @@ public abstract class BaseRepository<T> {
     protected void update(String query, Object... params) {
         int rowsAffected = jdbcTemplate.update(query, params);
         if (rowsAffected == 0) {
-            throw new InternalServerException("Не удалось обновить данные");
+            log.info("Запрос не привел к обновлению данных. Возможно, данные уже соответствуют указанным параметрам.");
         }
     }
 

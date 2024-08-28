@@ -3,7 +3,7 @@ VALUES ('email1@email.com', 'login1', 'name1', '1999-09-09'),
        ('email2@email.com', 'login2', 'name2', '1999-09-09'),
        ('email3@email.com', 'login3', 'name3', '1999-09-09');
 
-INSERT INTO FRIENDSHIPS (FROM_USER_ID, TO_USER_ID, ACCEPTED)
+INSERT INTO FRIENDSHIPS (USER_ID, FRIEND_ID, ACCEPTED)
 VALUES (2, 1, true),
        (1, 2, true),
        (2, 3, false);

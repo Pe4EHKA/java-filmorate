@@ -11,11 +11,11 @@ import java.util.Collection;
 
 @Slf4j
 @Service
-public class GenreDbService implements GenreService {
+public class GenreServiceImpl implements GenreService {
     private final GenreRepository genreRepository;
 
     @Autowired
-    public GenreDbService(GenreRepository genreRepository) {
+    public GenreServiceImpl(GenreRepository genreRepository) {
         this.genreRepository = genreRepository;
     }
 

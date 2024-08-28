@@ -6,14 +6,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(of = {"fromUserId", "toUserId"})
+@EqualsAndHashCode(of = {"userId", "friendId"})
 @Builder
 public class Friendship {
     @NotNull
-    private Long fromUserId;
+    private Long userId;
 
     @NotNull
-    private Long toUserId;
+    private Long friendId;
 
     @NotNull
     private Boolean accepted;

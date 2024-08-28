@@ -141,32 +141,4 @@ class FilmDbStorageTest {
         assertFalse(genresToFilmDb.isEmpty());
         assertEquals(genresToFilm, genresToFilmDb);
     }
-
-    @Test
-    @DisplayName("Removing genres from film")
-    void removeFilmGenres() {
-        filmDbStorage.removeFilmGenres(1L);
-        LinkedHashSet<Genre> genresToFilmDb = filmDbStorage.getFilmGenres(1L);
-
-        assertNotNull(genresToFilmDb);
-        assertTrue(genresToFilmDb.isEmpty());
-    }
-
-    @Test
-    @DisplayName("Updating film genres")
-    void updateFilmGenres() {
-        LinkedHashSet<Genre> genresToUpdate = new LinkedHashSet<>();
-        genresToUpdate.add(Genre.builder().id(3L).name("Мультфильм").build());
-
-        assertEquals(2, filmDbStorage.getFilmGenres(1L).size());
-
-        filmDbStorage.updateFilmGenres(1L, genresToUpdate);
-
-        LinkedHashSet<Genre> genresToFilmDb = filmDbStorage.getFilmGenres(1L);
-
-        assertNotNull(genresToFilmDb);
-        assertFalse(genresToFilmDb.isEmpty());
-        assertEquals(genresToUpdate, genresToFilmDb);
-        assertEquals(1, filmDbStorage.getFilmGenres(1L).size());
-    }
 }

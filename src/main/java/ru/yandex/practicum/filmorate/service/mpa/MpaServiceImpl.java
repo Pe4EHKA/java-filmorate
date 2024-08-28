@@ -11,11 +11,11 @@ import java.util.Collection;
 
 @Slf4j
 @Service
-public class MpaDbService implements MpaService {
+public class MpaServiceImpl implements MpaService {
     private final MpaRepository mpaRepository;
 
     @Autowired
-    public MpaDbService(MpaRepository mpaRepository) {
+    public MpaServiceImpl(MpaRepository mpaRepository) {
         this.mpaRepository = mpaRepository;
     }
 
