@@ -16,11 +16,36 @@ import java.util.*;
 @Slf4j
 @Repository
 public class FilmDbStorage extends BaseRepository<Film> implements FilmRepository {
-    private static final String FIND_ALL_QUERY = "SELECT id, name, description, release_date, duration, " +
-            "mpa_id FROM films";
+    private static final String FIND_ALL_QUERY = "SELECT " +
+            "f.id AS film_id, " +
+            "f.name AS film_name, " +
+            "f.description AS film_description, " +
+            "f.release_date AS film_release_date, " +
+            "f.duration AS film_duration, " +
+            "m.id AS mpa_id, " +
+            "m.name AS mpa_name, " +
+            "g.id AS genre_id, " +
+            "g.name AS genre_name " +
+            "FROM films AS f " +
+            "JOIN mpa AS m ON f.mpa_id = m.id " +
+            "LEFT OUTER JOIN film_genres AS fg ON f.id = fg.film_id " +
+            "LEFT OUTER JOIN genres AS g ON fg.genre_id = g.id";
 
-    private static final String FIND_BY_ID_QUERY = "SELECT id, name, description, release_date, duration, " +
-            "mpa_id FROM films WHERE id = ?";
+    private static final String FIND_BY_ID_QUERY = "SELECT " +
+            "f.id AS film_id, " +
+            "f.name AS film_name, " +
+            "f.description AS film_description, " +
+            "f.release_date AS film_release_date, " +
+            "f.duration AS film_duration, " +
+            "m.id AS mpa_id, " +
+            "m.name AS mpa_name, " +
+            "g.id AS genre_id, " +
+            "g.name AS genre_name " +
+            "FROM films AS f " +
+            "JOIN mpa AS m ON f.mpa_id = m.id " +
+            "LEFT OUTER JOIN film_genres AS fg ON f.id = fg.film_id " +
+            "LEFT OUTER JOIN genres AS g ON fg.genre_id = g.id " +
+            "WHERE f.id = ?";
 
     private static final String INSERT_FILM_QUERY = "INSERT INTO films (name, description, release_date, duration, " +
             "mpa_id) VALUES (?, ?, ?, ?, ?)";
@@ -40,7 +65,9 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmRepositor
 
     private final GenreRowMapper genreRowMapper;
 
-    public FilmDbStorage(JdbcTemplate jdbcTemplate, FilmRowMapper mapper, GenreRowMapper genreRowMapper) {
+    public FilmDbStorage(JdbcTemplate jdbcTemplate,
+                         FilmRowMapper mapper,
+                         GenreRowMapper genreRowMapper) {
         super(jdbcTemplate, mapper);
         this.genreRowMapper = genreRowMapper;
     }
@@ -48,14 +75,18 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmRepositor
     @Override
     public Collection<Film> getAllFilms() {
         log.debug("getAllFilms");
-        return findMany(FIND_ALL_QUERY);
+        FilmRowMapper filmRowMapper = new FilmRowMapper();
+        jdbcTemplate.query(FIND_ALL_QUERY, filmRowMapper);
+        return filmRowMapper.getAllFilms();
     }
 
 
     @Override
     public Optional<Film> getFilmById(long filmId) {
         log.debug("getFilmById {}", filmId);
-        return findOne(FIND_BY_ID_QUERY, filmId);
+        FilmRowMapper filmRowMapper = new FilmRowMapper();
+        jdbcTemplate.query(FIND_BY_ID_QUERY, filmRowMapper, filmId);
+        return filmRowMapper.getFilm();
     }
 
     @Override
@@ -93,7 +124,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmRepositor
         if (film.getGenres() != null) {
             updateFilmGenres(film.getId(), film.getGenres());
         }
-        Optional<Film> result = findOne(FIND_BY_ID_QUERY, film.getId());
+        Optional<Film> result = getFilmById(film.getId());
         if (result.isPresent()) {
             log.trace("Film updated {}", film);
             return result.get();

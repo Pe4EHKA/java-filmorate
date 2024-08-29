@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.controller.UserControllerException;
 import ru.yandex.practicum.filmorate.exception.repository.friendship.FriendshipAlreadyExists;
-import ru.yandex.practicum.filmorate.exception.repository.friendship.FriendshipNotFoundException;
 import ru.yandex.practicum.filmorate.exception.repository.user.UserAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.repository.user.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -143,11 +142,6 @@ public class UserServiceImpl implements UserService {
             log.warn(warnMessage);
             throw new UserControllerException(String.format(UserControllerException
                     .DELETE_YOURSELF_FROM_FRIENDS, userId));
-        }
-        if (!friendshipRepository.containsInvite(friendId, userId)) {
-            log.warn(warnMessage);
-            throw new FriendshipNotFoundException(String
-                    .format(FriendshipNotFoundException.FRIENDSHIP_NOT_FOUND, friendId, userId));
         }
     }
 

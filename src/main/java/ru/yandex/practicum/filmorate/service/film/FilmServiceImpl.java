@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.exception.repository.film.FilmAlreadyExists
 import ru.yandex.practicum.filmorate.exception.repository.film.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.repository.film.LikeAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.repository.film.LikeNotFoundException;
-import ru.yandex.practicum.filmorate.exception.repository.genre.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.exception.repository.genre.GenreWrongNumberException;
 import ru.yandex.practicum.filmorate.exception.repository.mpa.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.exception.repository.mpa.MpaWrongNumberException;
 import ru.yandex.practicum.filmorate.exception.repository.user.UserNotFoundException;
@@ -21,6 +21,7 @@ import ru.yandex.practicum.filmorate.repository.mpa.MpaRepository;
 import ru.yandex.practicum.filmorate.repository.user.UserRepository;
 
 import java.util.Collection;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -70,11 +71,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film updateFilm(Film film) {
         checkFilmBeforeUpdate(film);
-        Film result = filmRepository.updateFilm(film);
-        result.setMpa(mpaRepository.getMpa(result.getMpa().getId()).orElseThrow(() -> new MpaNotFoundException(String
-                .format(MpaNotFoundException.MPA_NOT_FOUND, film.getMpa().getId()))));
-        result.setGenres(filmRepository.getFilmGenres(result.getId()));
-        return result;
+        return filmRepository.updateFilm(film);
     }
 
     @Override
@@ -92,13 +89,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Collection<Film> getAllFilms() {
         log.debug("getAllFilms");
-        Collection<Film> films = filmRepository.getAllFilms();
-        for (Film film : films) {
-            film.setMpa(mpaRepository.getMpa(film.getMpa().getId()).orElseThrow(() -> new MpaNotFoundException(String
-                    .format(MpaNotFoundException.MPA_NOT_FOUND, film.getMpa().getId()))));
-            film.setGenres(filmRepository.getFilmGenres(film.getId()));
-        }
-        return films;
+        return filmRepository.getAllFilms();
     }
 
     @Override
@@ -131,10 +122,15 @@ public class FilmServiceImpl implements FilmService {
             log.warn(warnMessage);
             throw new MpaWrongNumberException(String.format(MpaNotFoundException.MPA_NOT_FOUND, film.getMpa().getId()));
         }
-        for (Genre genre : genreRepository.getAllGenres()) {
-            if (!genreRepository.containsGenre(genre.getId())) {
-                log.warn(warnMessage);
-                throw new GenreNotFoundException(String.format(GenreNotFoundException.GENRE_NOT_FOUND, genre.getId()));
+        Set<Genre> filmGenreSet = film.getGenres();
+        Collection<Genre> genresDb = genreRepository.getAllGenres();
+        if (filmGenreSet != null && !filmGenreSet.isEmpty()) {
+            for (Genre genre : filmGenreSet) {
+                if (!genresDb.contains(genre)) {
+                    log.warn(warnMessage);
+                    throw new GenreWrongNumberException(String
+                            .format(GenreWrongNumberException.GENRE_WRONG_NUMBER_FOUND, genre.getId()));
+                }
             }
         }
     }
@@ -149,14 +145,6 @@ public class FilmServiceImpl implements FilmService {
         if (!mpaRepository.containsMpa(film.getMpa().getId())) {
             log.warn(warnMessage);
             throw new MpaNotFoundException(String.format(MpaNotFoundException.MPA_NOT_FOUND, film.getMpa().getId()));
-        }
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            for (Genre genre : film.getGenres()) {
-                if (!genreRepository.containsGenre(genre.getId())) {
-                    log.warn(warnMessage);
-                    throw new GenreNotFoundException(String.format(GenreNotFoundException.GENRE_NOT_FOUND, genre.getId()));
-                }
-            }
         }
     }
 

@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.repository.BaseRepository;
 import ru.yandex.practicum.filmorate.repository.mappers.FriendshipRowMapper;
@@ -68,8 +67,9 @@ public class FriendshipDbStorage extends BaseRepository<Friendship> implements F
         Optional<Friendship> optionalFriendship = findOne(FIND_BY_ID_QUERY,
                 userId, friendId);
         if (optionalFriendship.isEmpty()) {
-            throw new NotFoundException("Пользователей с ID USER_ID: " + userId + " FRIEND_ID: " + friendId
+            log.trace("Пользователей с ID USER_ID: " + userId + " FRIEND_ID: " + friendId
                     + " не найдено");
+            return;
         }
         delete(DELETE_QUERY, userId, friendId);
         if (optionalFriendship.get().getAccepted()) {

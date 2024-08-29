@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.exception.repository.friendship.FriendshipNotFoundException;
 import ru.yandex.practicum.filmorate.exception.repository.genre.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.exception.repository.genre.GenreWrongNumberException;
 import ru.yandex.practicum.filmorate.exception.repository.mpa.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.exception.repository.mpa.MpaWrongNumberException;
 import ru.yandex.practicum.filmorate.exception.repository.user.UserNotFoundException;
@@ -35,6 +35,7 @@ public class ErrorHandler {
     @ExceptionHandler({
             ValidationException.class,
             MpaWrongNumberException.class,
+            GenreWrongNumberException.class,
             DataIntegrityViolationException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -49,13 +50,6 @@ public class ErrorHandler {
     })
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleInternalServerExceptions(final InternalServerException e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.OK)  // Без этого Handler'а не проходит один тест, решил оставить
-    public ErrorResponse handleFriendshipNotFoundException(final FriendshipNotFoundException e) {
         log.error(e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }

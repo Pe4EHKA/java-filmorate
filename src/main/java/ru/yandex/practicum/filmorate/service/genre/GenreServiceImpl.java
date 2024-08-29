@@ -22,10 +22,6 @@ public class GenreServiceImpl implements GenreService {
     @Override
     public Genre getGenre(long genreId) {
         log.debug("getGenre: genreId={}", genreId);
-        if (!genreRepository.containsGenre(genreId)) {
-            log.warn("Genre with id {} not found", genreId);
-            throw new GenreNotFoundException(String.format(GenreNotFoundException.GENRE_NOT_FOUND, genreId));
-        }
         return genreRepository.getGenre(genreId)
                 .orElseThrow(() -> new GenreNotFoundException(String
                         .format(GenreNotFoundException.GENRE_NOT_FOUND, genreId)));
