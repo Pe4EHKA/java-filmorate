@@ -51,8 +51,8 @@ public class InMemoryFilmRepository implements FilmRepository {
     }
 
     @Override
-    public LinkedHashSet<Genre> getFilmGenres(long filmId) {
-        return new LinkedHashSet<>();
+    public Map<Long, LinkedHashSet<Genre>> getFilmGenres(List<Long> filmIds) {
+        return Map.of();
     }
 
     @Override

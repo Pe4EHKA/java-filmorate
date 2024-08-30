@@ -33,7 +33,7 @@ class FilmLikeDbStorageTest {
         final Like like = getTestLike();
         filmLikeDbStorage.addLikeFilm(like.getFilmId(), like.getUserId());
 
-        assertTrue(filmLikeDbStorage.isLikeFilm(like.getFilmId(), like.getUserId()));
+        assertEquals(2, filmLikeDbStorage.getFilmLikes(like.getFilmId()).size());
     }
 
     @Test
@@ -41,18 +41,12 @@ class FilmLikeDbStorageTest {
     void deleteLikeFilm() {
         filmLikeDbStorage.deleteLikeFilm(1L, 1L);
 
-        assertFalse(filmLikeDbStorage.isLikeFilm(1L, 1L));
+        assertEquals(0, filmLikeDbStorage.getFilmLikes(1L).size());
     }
 
     @Test
     @DisplayName("Count likes on the film")
     void countLikeFilm() {
-        assertEquals(1, filmLikeDbStorage.countLikeFilm(1));
-    }
-
-    @Test
-    @DisplayName("Check like to film from user")
-    void isLikeFilm() {
-        assertTrue(filmLikeDbStorage.isLikeFilm(1L, 1L));
+        assertEquals(1, filmLikeDbStorage.getFilmLikes(1).size());
     }
 }

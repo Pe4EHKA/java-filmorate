@@ -49,8 +49,10 @@ public class FriendshipDbStorage extends BaseRepository<Friendship> implements F
     }
 
     @Override
-    public void addToFriends(long userId, long friendId, boolean accepted) {
-        log.debug("Adding to friends: {}, {}, {}", userId, friendId, accepted);
+    public void addToFriends(long userId, long friendId) {
+        log.debug("Adding to friends: {}, {}", userId, friendId);
+        boolean accepted;
+        accepted = findOne(FIND_BY_ID_QUERY, friendId, userId).isPresent();
         jdbcTemplate
                 .update(INSERT_QUERY, userId, friendId, accepted);
         Optional<Friendship> friendship = findOne(FIND_BY_ID_QUERY, userId, friendId);
@@ -77,11 +79,5 @@ public class FriendshipDbStorage extends BaseRepository<Friendship> implements F
             log.debug("Friendship between {} and {} now is not mutual", friendId, userId);
         }
         log.trace("Removed from friends: {}, {}", userId, friendId);
-    }
-
-    @Override
-    public boolean containsInvite(long userId, long friendId) {
-        log.debug("Contains invite: {}, {}", userId, friendId);
-        return findOne(FIND_BY_ID_QUERY, userId, friendId).isPresent();
     }
 }

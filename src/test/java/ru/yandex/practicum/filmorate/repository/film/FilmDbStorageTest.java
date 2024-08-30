@@ -115,7 +115,8 @@ class FilmDbStorageTest {
         genresToFilm.add(Genre.builder().id(1L).name("Комедия").build());
         genresToFilm.add(Genre.builder().id(2L).name("Драма").build());
 
-        LinkedHashSet<Genre> genresToFilmDb = filmDbStorage.getFilmGenres(1L);
+        LinkedHashSet<Genre> genresToFilmDb = filmDbStorage.getFilmGenres(List.of(1L))
+                .getOrDefault(1L, new LinkedHashSet<>());
 
         assertNotNull(genresToFilmDb);
         assertFalse(genresToFilmDb.isEmpty());
@@ -135,7 +136,7 @@ class FilmDbStorageTest {
 
         filmDbStorage.addFilmGenres(1L, genresToInsert);
 
-        LinkedHashSet<Genre> genresToFilmDb = filmDbStorage.getFilmGenres(1L);
+        LinkedHashSet<Genre> genresToFilmDb = filmDbStorage.getFilmGenres(List.of(1L)).getOrDefault(1L, new LinkedHashSet<>());
 
         assertNotNull(genresToFilmDb);
         assertFalse(genresToFilmDb.isEmpty());

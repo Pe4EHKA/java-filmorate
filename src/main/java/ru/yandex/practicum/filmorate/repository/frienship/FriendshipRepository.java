@@ -7,9 +7,7 @@ public interface FriendshipRepository {
 
     Collection<Long> getMutualFriends(long userId, long friendId);
 
-    void addToFriends(long userId, long toUserId, boolean accepted);
+    void addToFriends(long userId, long toUserId);
 
     void removeFromFriends(long userId, long toUserId);
-
-    boolean containsInvite(long userId, long toUserId);
 }

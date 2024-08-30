@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.controller.UserControllerException;
-import ru.yandex.practicum.filmorate.exception.repository.friendship.FriendshipAlreadyExists;
 import ru.yandex.practicum.filmorate.exception.repository.user.UserAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.repository.user.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -55,8 +54,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User addToFriends(long userId, long friendId) {
         checkFriendshipBeforeAdd(userId, friendId);
-        boolean isMutual = friendshipRepository.containsInvite(friendId, userId);
-        friendshipRepository.addToFriends(friendId, userId, isMutual);
+        friendshipRepository.addToFriends(friendId, userId);
         return userRepository.getUserById(friendId).orElseThrow(
                 () -> new UserNotFoundException(String.format(UserNotFoundException.USER_NOT_FOUND, friendId)));
     }
@@ -123,11 +121,6 @@ public class UserServiceImpl implements UserService {
         log.debug("CheckFriendship before adding user {} and friend {}", userId, friendId);
         String warnMessage = "Troubles with adding friendship";
         checkUsersExist(userId, friendId, warnMessage);
-        if (friendshipRepository.containsInvite(friendId, userId)) {
-            log.warn(warnMessage);
-            throw new FriendshipAlreadyExists(String.format(FriendshipAlreadyExists.FRIENDSHIP_ALREADY_EXISTS,
-                    friendId, userId));
-        }
         if (userId == friendId) {
             log.warn(warnMessage);
             throw new UserControllerException(String.format(UserControllerException.ADD_YOURSELF, userId));

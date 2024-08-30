@@ -1,4 +1,4 @@
-MERGE INTO GENRES (ID, NAME)
+MERGE INTO GENRES (GENRE_ID, GENRE_NAME)
     VALUES (1, 'Комедия'),
            (2, 'Драма'),
            (3, 'Мультфильм'),
@@ -6,7 +6,7 @@ MERGE INTO GENRES (ID, NAME)
            (5, 'Документальный'),
            (6, 'Боевик');
 
-MERGE INTO MPA (ID, NAME)
+MERGE INTO MPA (MPA_ID, MPA_NAME)
     VALUES (1, 'G'),
            (2, 'PG'),
            (3, 'PG-13'),

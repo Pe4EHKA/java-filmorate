@@ -13,8 +13,8 @@ import java.util.Optional;
 @Slf4j
 @Repository
 public class MpaDbStorage extends BaseRepository<Mpa> implements MpaRepository {
-    private static final String FIND_BY_ID_QUERY = "SELECT id, name FROM mpa WHERE id = ?";
-    private static final String FIND_ALL_QUERY = "SELECT * FROM mpa ORDER BY id";
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM mpa WHERE mpa_id = ?";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM mpa ORDER BY mpa_id";
 
     public MpaDbStorage(JdbcTemplate jdbcTemplate, MpaRowMapper mapper) {
         super(jdbcTemplate, mapper);

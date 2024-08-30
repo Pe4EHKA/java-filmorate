@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.repository.film.FilmAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.repository.film.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.repository.film.LikeAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exception.repository.film.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.exception.repository.genre.GenreWrongNumberException;
 import ru.yandex.practicum.filmorate.exception.repository.mpa.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.exception.repository.mpa.MpaWrongNumberException;
@@ -20,8 +18,7 @@ import ru.yandex.practicum.filmorate.repository.genre.GenreRepository;
 import ru.yandex.practicum.filmorate.repository.mpa.MpaRepository;
 import ru.yandex.practicum.filmorate.repository.user.UserRepository;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -49,10 +46,8 @@ public class FilmServiceImpl implements FilmService {
     public Film getFilmById(long id) {
         Film film = filmRepository.getFilmById(id)
                 .orElseThrow(() -> new FilmNotFoundException(String.format(FilmNotFoundException.FILM_NOT_FOUND, id)));
-        film.setGenres(filmRepository.getFilmGenres(id));
-        film.setMpa(mpaRepository.getMpa(film.getMpa().getId())
-                .orElseThrow(() -> new MpaNotFoundException(String
-                        .format(MpaNotFoundException.MPA_NOT_FOUND, film.getMpa().getId()))));
+        Map<Long, LinkedHashSet<Genre>> filmGenres = filmRepository.getFilmGenres(List.of(film.getId()));
+        film.setGenres(filmGenres.getOrDefault(id, new LinkedHashSet<>()));
         return film;
     }
 
@@ -64,7 +59,8 @@ public class FilmServiceImpl implements FilmService {
         result.setMpa(mpaRepository.getMpa(film.getMpa().getId())
                 .orElseThrow(() -> new MpaNotFoundException(String
                         .format(MpaNotFoundException.MPA_NOT_FOUND, film.getMpa().getId()))));
-        result.setGenres(filmRepository.getFilmGenres(result.getId()));
+        Map<Long, LinkedHashSet<Genre>> filmGenres = filmRepository.getFilmGenres(List.of(result.getId()));
+        result.setGenres(filmGenres.getOrDefault(result.getId(), new LinkedHashSet<>()));
         return result;
     }
 
@@ -89,7 +85,15 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Collection<Film> getAllFilms() {
         log.debug("getAllFilms");
-        return filmRepository.getAllFilms();
+        Collection<Film> films = filmRepository.getAllFilms();
+        List<Long> filmIds = films.stream()
+                .map(Film::getId)
+                .toList();
+        Map<Long, LinkedHashSet<Genre>> genresMap = filmRepository.getFilmGenres(filmIds);
+        for (Film film : films) {
+            film.setGenres(genresMap.getOrDefault(film.getId(), new LinkedHashSet<>()));
+        }
+        return films;
     }
 
     @Override
@@ -102,8 +106,8 @@ public class FilmServiceImpl implements FilmService {
     }
 
     private Integer compareLikes(Film film, Film toCompareFilm) {
-        return Integer.compare(filmLikeRepository.countLikeFilm(toCompareFilm.getId()),
-                filmLikeRepository.countLikeFilm(film.getId()));
+        return Integer.compare(filmLikeRepository.getFilmLikes(toCompareFilm.getId()).size(),
+                filmLikeRepository.getFilmLikes(film.getId()).size());
     }
 
     private void checkFilmBeforeAdd(Film film) {
@@ -152,22 +156,12 @@ public class FilmServiceImpl implements FilmService {
         log.debug("Checking from User: {} like before adding to film: {}", userId, filmId);
         String warnMessage = "Troubles with adding like to film";
         checkFilmUserExists(filmId, userId, warnMessage);
-        if (filmLikeRepository.isLikeFilm(filmId, userId)) {
-            log.warn(warnMessage);
-            throw new LikeAlreadyExistsException(String
-                    .format(LikeAlreadyExistsException.LIKE_ALREADY_EXISTS, filmId, userId));
-        }
     }
 
     private void checkLikeBeforeDelete(long filmId, long userId) {
         log.debug("Checking from User: {} like before delete from film: {}", userId, filmId);
         String warnMessage = "Troubles with deleting like from film";
         checkFilmUserExists(filmId, userId, warnMessage);
-        if (!filmLikeRepository.isLikeFilm(filmId, userId)) {
-            log.warn(warnMessage);
-            throw new LikeNotFoundException(String
-                    .format(LikeNotFoundException.LIKE_NOT_FOUND, filmId, userId));
-        }
     }
 
     private void checkFilmUserExists(long filmId, long userId, String warnMessage) {

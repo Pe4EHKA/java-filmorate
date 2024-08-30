@@ -43,21 +43,19 @@ class FriendshipDbStorageTest {
     void addToFriends() {
         Friendship friendship = getTestFriendship();
         friendshipDbStorage
-                .addToFriends(friendship.getUserId(), friendship.getFriendId(), friendship.getAccepted());
+                .addToFriends(friendship.getUserId(), friendship.getFriendId());
 
-        assertTrue(friendshipDbStorage.containsInvite(friendship.getUserId(), friendship.getFriendId()));
+        Collection<Long> invitesFriends = friendshipDbStorage.getFriendInvitesToUser(friendship.getFriendId());
+
+        assertTrue(invitesFriends.contains(friendship.getUserId()));
     }
 
     @Test
     @DisplayName("Removing from friends")
     void removeFromFriends() {
         friendshipDbStorage.removeFromFriends(1L, 2L);
-        assertFalse(friendshipDbStorage.containsInvite(1L, 2L));
-    }
 
-    @Test
-    @DisplayName("Checking DB contains friendship")
-    void containsInvite() {
-        assertTrue(friendshipDbStorage.containsInvite(1L, 2L));
+        Collection<Long> invitesFriends = friendshipDbStorage.getFriendInvitesToUser(2L);
+        assertTrue(!invitesFriends.contains(2L));
     }
 }
