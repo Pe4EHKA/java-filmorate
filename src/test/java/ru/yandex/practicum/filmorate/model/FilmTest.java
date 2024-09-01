@@ -27,6 +27,7 @@ class FilmTest {
                 .description("Hero movie")
                 .releaseDate(LocalDate.of(2012, 4, 11))
                 .duration(137)
+                .mpa(new Mpa(1L, "name"))
                 .build();
     }
 
